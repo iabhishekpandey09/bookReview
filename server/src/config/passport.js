@@ -27,6 +27,13 @@ passport.use(
       try {
         const email = profile.emails?.[0]?.value;
         const avatar = profile.photos?.[0]?.value || "";
+        
+        console.log("🔍 Google Profile Debug:", {
+          displayName: profile.displayName,
+          email: email,
+          photos: profile.photos,
+          avatar: avatar
+        });
 
         // Check if user already exists in our database
         let user = await User.findOne({ googleId: profile.id });

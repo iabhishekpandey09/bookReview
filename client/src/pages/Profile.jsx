@@ -59,7 +59,10 @@ function Profile({ user }) {
               src={profileUser.avatar}
               alt={profileUser.name}
               className="profile-avatar"
-              onError={(e) => { e.target.onerror = null; e.target.src = profileAvatarFallback; }}
+              onError={(e) => { 
+                e.target.onerror = null; 
+                e.target.src = profileAvatarFallback; 
+              }}
             />
           ) : (
             <div className="profile-avatar-placeholder">

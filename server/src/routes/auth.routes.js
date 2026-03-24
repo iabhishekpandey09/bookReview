@@ -3,7 +3,7 @@ const router = express.Router();
 const passport = require("../config/passport");
 const jwt = require("jsonwebtoken");
 const authMiddleware = require("../middleware/authMiddleware");
-const { getMe, getProfile } = require("../controllers/auth.controller");
+const { getMe, getProfile, getAvatar } = require("../controllers/auth.controller");
 
 router.get("/google",
   passport.authenticate("google", {
@@ -41,6 +41,7 @@ router.get("/me", authMiddleware, getMe);
 
 router.get("/profile", authMiddleware, getProfile);
 
+router.get("/avatar/:userId", getAvatar);
 
 router.post("/logout", (req, res) => {
   res.clearCookie("token");

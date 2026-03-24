@@ -1,4 +1,6 @@
 const Review = require("../models/review.model");
+const User = require("../models/user.model");
+const axios = require("axios");
 
 const getMe = async (req, res) => {
   try {
@@ -32,13 +34,16 @@ const getProfile = async (req, res) => {
 
       avgRating = average.toFixed(1);
     }
+    
+    // Return avatar URL via backend endpoint
+    const avatarUrl = req.user.avatar ? `/auth/avatar/${req.user._id}` : "";
 
     res.json({
       user: {
         id: req.user._id,
         name: req.user.name,
         email: req.user.email,
-        avatar: req.user.avatar,
+        avatar: avatarUrl,
       },
       stats: {
         totalReviews,
@@ -47,8 +52,33 @@ const getProfile = async (req, res) => {
       recentReviews: myReviews.slice(0, 10), 
     });
   } catch (error) {
+    console.error("Profile error:", error);
     res.status(500).json({ message: "Something went wrong" });
   }
 };
 
-module.exports = { getMe, getProfile };
+const getAvatar = async (req, res) => {
+  try {
+    const { userId } = req.params;
+    const user = await User.findById(userId);
+    
+    if (!user || !user.avatar) {
+      return res.status(404).json({ message: "Avatar not found" });
+    }
+    
+    // Fetch the Google avatar image and serve it
+    const response = await axios.get(user.avatar, {
+      responseType: "arraybuffer",
+      timeout: 5000,
+    });
+    
+    res.set("Content-Type", response.headers["content-type"]);
+    res.set("Cache-Control", "public, max-age=86400"); // Cache for 24 hours
+    res.send(response.data);
+  } catch (error) {
+    console.error("Avatar fetch error:", error.message);
+    res.status(500).json({ message: "Failed to load avatar" });
+  }
+};
+
+module.exports = { getMe, getProfile, getAvatar };
